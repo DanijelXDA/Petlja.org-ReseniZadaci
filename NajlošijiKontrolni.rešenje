@@ -1,0 +1,83 @@
+Rešenje
+Određivanje zbira i minimuma
+Prosek svih ocena se može dobiti tako što se zbir svih ocena podeli brojem svih ocena. U našem slučaju najlošija ocena ne ulazi u prosek i zato je potrebno da izračunamo zbir svih ocena bez najlošije. Najjednostavniji način da to uradimo je da izračunamo zbir svih pet ocena, a zatim da od njega oduzmemo najmanju od tih pet ocena. Dakle, nakon što učitamo 5 ocena, izračunaćemo njihov zbir i njihov minimum, oduzeti minimum od zbira i podeliti sa 4 (da bismo umesto celobrojnog koristili realno deljenje, potrebno je upotrebiti konstantu 4.0).
+
+Postoje razni načini da se odredi minimum pet brojeva. Preglednosti radi, to možemo izdvojiti u zasebnu funkciju.
+
+Minimum više brojeva može se odrediti i uzastopnom primenom minimuma dva broja (slično kao što se i zbir više brojeva može izračunati tako što se uzastopno izračunava zbir dva broja). Zaista, važi da se zbir više brojeva izračunava tako što se izračuna
+
+(((broj1 + broj2) + broj3) + broj4) + broj5
+i u ovom izrazu se novi broj uvek dodaje na zbir svih prethodnih brojeva. Drugi način da se isto ovo izračunavanje realizuje je da se uvede pomoćna promenljiva zbir koja bi se uvećavala za tekući element.
+
+zbir = broj1;
+zbir = zbir + broj2;
+zbir = zbir + broj3;
+zbir = zbir + broj4;
+zbir = zbir + broj5;
+Potpuno analogno se može izračunati minimum, jedino što se umesto operacije sabiranja dva broja koristi operacija minimuma dva broja. U svakom koraku se računa minimum minimuma svih prethodnih brojeva i tekućeg broja.
+
+min(min(min(min(broj1, broj2), broj3), broj4), broj5)
+ili
+
+minimum = broj1;
+minimum = min(minimum, broj2);
+minimum = min(minimum, broj3);
+minimum = min(minimum, broj4);
+minimum = min(minimum, broj5);
+Minimum dva broja može se izračunati bibliotečkim funkcijama min tj. Math.Min. Primetimo da polazno rešenje sa grananjem realizuje potpuno isti postupak (jedino što se u slučaju da je tekući broj veći ili jednak od ranije vrednosti minimuma preskače bespotrebna dodela).
+
+Ako bi se umesto bibliotečke funkcije za računanje dva broja upotrebilo grananje, došlo bi se sledećeg koda.
+
+minimum = broj1;
+minimum = broj2 < minimum ? broj2 : minimum;
+minimum = broj3 < minimum ? broj3 : minimum;
+minimum = broj4 < minimum ? broj4 : minimum;
+minimum = broj5 < minimum ? broj5 : minimum;
+tj.
+
+minimum = broj1;
+if (broj2 < minimum)
+   minimum = broj2;
+else
+   minimum = minimum;
+if (broj3 < minimum)
+   minimum = broj3;
+else
+   minimum = minimum;
+...
+Jasno je da grane else nemaju nikakav efekat i mogu se izostaviti. Time dobijamo standardni algoritam određivanja minimuma. Promenljivu minimum inicijalizovaćemo na vrednost prvog broja, a zatim ćemo je redom porediti sa drugim, trećim, četvrtim i petim i kada god je neki od tih brojeva manji od dotadašnje vrednosti minimuma tj. vrednosti promenljive minimum, ažuriraćemo vrednost te promenljive i postavićemo je na broj za koji smo otkrili da je manji od nje.
+
+minimum = broj1;
+if (broj2 < minimum)
+   minimum = broj2;
+if (broj3 < minimum)
+   minimum = broj3;
+if (broj4 < minimum)
+   minimum = broj4;
+if (broj5 < minimum)
+   minimum = broj5;
+U prvom koraku vrednost promenljive minimum biće minimum jednočlanog skupa {broj1}, u drugom biće minimum dvočlanog skupa {broj1, broj2}, nakon trećeg biće minimum skupa {broj1, broj2, broj3} i tako dalje. Zaista, ako je, na primer, vrednost promenljive minumum vrednost minimuma skupa {broj1, broj2, broj3} i ako je broj4 manji od vrednosti te promenljive, tada je broj4 manji od najmanje vrednosti u skupu {broj1, broj2, broj3}, što znači da je manji od svih vrednosti tog skupa i da je minimum skupa {broj1, broj2, broj3, broj4} upravo broj4. Pošto se vrednost promenljive minimum ažurira na vrednost broj4 održava se invarijanta i važi da je vrednost promenljive minimum upravo minimum skupa {broj1, broj2, broj3, broj4}. Sa druge strane, ako uslov ne važi, to znači da je najmanji od brojeva iz skupa {broj1, broj2, broj3} manji ili jednak vrednosti broj4 i to je ujedno minimum skupa {broj1, broj2, broj3, broj4}. Pošto se vrednost promenljive minimum ne menja, invarijanta je opet održana.
+
+Recimo i da se ponavljanje koda može izbeći ako bi se upotrebila petlja.
+
+// ucitaj broj
+minimum = broj;
+for (int i = 1; i < 5; i++) {
+   // ucitaj broj
+   if (broj < minimum)
+      minimum = broj;
+}   
+
+Ovu tehniku ćemo primenjivati kada budemo radili sa dužim serijama elemenata (na primer, u zadatku Prosek skokova, koji je veoma sličan ovome, ali broj elemenata nije u startu fiksiran, već se učitava sa ulaza).
+
+Bibliotečke funkcije
+Umesto ručne implementacije određivanja minimuma četiri promenljive, možemo upotrebiti niz i bibliotečke funkcije za određivanje maksimuma niza.
+
+U jeziku C++, počevši od standarda C++-11 uvedena je tzv. lista inicijalizatora (engl. initializer list) koja omogućava da se nekim funkcijama prosledi anoniman niz sačinjen od nekoliko elemenata navedenih u vitičastim zagradama. Za naš zadatak važna je funkcija min koja može da primi takvu listu. Tako se izrazom min({broj1, broj2, broj3, broj4}) može veoma jednostavno odrediti najmanji od četiri data broja.
+
+Druga mogućnost je da se brojevi smeste u klasičan niz ili vektor i da se upotrebi bibliotečka funkcija min_element (više reči o ovome biće u zadatku Minimalno odstupanje od proseka).
+
+U jeziku C# najjednostavnije je brojeve smestiti u klasičan dinamički niz ili listu i zatim zbir i minimum odrediti metodama Sum i Min koje pripadaju biblioteci Linq (više reči o ovome biće u zadatku Minimalno odstupanje od proseka).
+
+Sortiranje
+Drugi način je da sortiramo sve ocene neopadajuće i da izračunamo prosek svih elemenata sortiranog niza ocena osim prvog (to je ocena na najlošije urađenom kontrolnom). Načini sortiranja male serije elemenata opisani su u zadatku Uredi tri broja. Možda najjednostavniji je da se brojevi smeste u niz i da se upotrebi bibliotečka funkcija sort (o raznim vrstama nizova u jezicima C++ i C# biće reči u zadatku Minimalno odstupanje od proseka).
